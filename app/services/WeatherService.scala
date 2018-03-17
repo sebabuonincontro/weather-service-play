@@ -2,6 +2,7 @@ package services
 
 import com.google.inject.Inject
 import domain.Weather
+import exceptions.WeatherServiceException
 import play.api.Configuration
 
 import scala.concurrent.Future
@@ -15,7 +16,8 @@ class WeatherService @Inject() (configuration: Configuration) {
   )
 
   def getAll(): Future[List[Weather]] = {
-    Future.successful(list)
+    //Future.successful(list)
+    Future.failed(WeatherServiceException("Error Grave"))
   }
 
   def getBy(id: Long) : Future[Option[Weather]] = {
