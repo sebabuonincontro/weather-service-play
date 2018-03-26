@@ -1,20 +1,29 @@
 package controllers
 
-import javax.inject.Inject
+import javax.inject._
 
+import actors.WeatherActor.CreateWeather
+import akka.actor.ActorRef
+import akka.util.Timeout
 import com.google.inject.Singleton
+import domain.Weather
 import exceptions.WeatherServiceException
 import play.api.libs.json.Json
-import play.api.mvc.{AbstractController, ControllerComponents}
 import services.WeatherService
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+import domain.ImplicitsJson._
+import play.api.mvc.InjectedController
 
 @Singleton
-class WeatherController @Inject()(cc: ControllerComponents,
-                                  weatherService: WeatherService) extends AbstractController(cc) {
+class WeatherController @Inject()(@Named("weather-actor") actor: ActorRef,
+                                  weatherService: WeatherService)
+                                 (implicit ec: ExecutionContext) extends InjectedController {
 
-  def getAll() = Action.async { implicit request =>
+  implicit val timeout: Timeout = 5.seconds
+
+  def getAll() = Action.async { request =>
     weatherService
       .getAll()
       .map { list =>
@@ -25,11 +34,37 @@ class WeatherController @Inject()(cc: ControllerComponents,
       }
   }
 
-  def getBy(id: String) = Action.async { implicit request =>
+  def getBy(id: String) = Action.async { request =>
     weatherService
       .getBy(id.toLong)
       .map { value =>
         Ok(Json.toJson(value))
+      }.recover{
+        case e: WeatherServiceException => InternalServerError(Json.toJson(e))
       }
+  }
+
+  def create() = Action(parse.json) { request =>
+    val weather = request.body.validate[Weather]
+
+    weather.fold(
+      error => InternalServerError("error"),
+      newWeather => {
+        actor ! CreateWeather(newWeather)
+        Ok("Sending To create.")
+      }
+    )
+  }
+
+  def update() = Action(parse.json) { request =>
+    val weather = request.body.validate[Weather]
+
+    weather.fold(
+      error => InternalServerError("error"),
+      newWeather => {
+        actor ! CreateWeather(newWeather)
+        Ok("Sending To create.")
+      }
+    )
   }
 }
