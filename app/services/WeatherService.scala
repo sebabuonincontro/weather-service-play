@@ -4,11 +4,16 @@ import com.google.inject.Inject
 import domain.Weather
 import listeners.WeatherCreateProducer
 import play.api.{Configuration, Logger}
+import repository.WeatherRepository
+import domain.ImplicitsJson._
+import play.api.libs.json.Json
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WeatherService @Inject() (configuration: Configuration,
-                                weatherCreateProducer: WeatherCreateProducer) {
+                                weatherCreateProducer: WeatherCreateProducer,
+                                weatherRepository: WeatherRepository) {
 
   val logger = Logger(this.getClass)
 
@@ -19,9 +24,12 @@ class WeatherService @Inject() (configuration: Configuration,
   )
 
   def getAll(): Future[List[Weather]] = {
-
-    Future.successful(list)
-    //Future.failed(WeatherServiceException("Error Grave"))
+    weatherRepository.getAll().map { map =>
+      map
+        .toList
+        .map(_._2)
+        .map(w => Json.fromJson(Json.parse(w)).get)
+    }
   }
 
   def getBy(id: Long) : Future[Option[Weather]] = {

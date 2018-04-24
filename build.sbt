@@ -9,10 +9,12 @@ scalaVersion := "2.12.4"
 
 libraryDependencies ++= Seq(
   guice
-  ,"org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
+  ,"org.scalatestplus.play"   %% "scalatestplus-play"   % "3.1.2" % Test
   // Latest release for Kafka 1.0.0:
-  ,"net.cakesolutions" %% "scala-kafka-client" % "1.0.0"
-  ,"com.typesafe.akka" %% "akka-stream-kafka" % "0.19"
+  ,"net.cakesolutions"        %% "scala-kafka-client"   % "1.0.0"
+  ,"com.typesafe.akka"        %% "akka-stream-kafka"    % "0.19"
+  //Redis
+  ,"net.debasishg"            %% "redisclient"          % "3.5"
 )
 
 // Adds additional packages into Twirl
