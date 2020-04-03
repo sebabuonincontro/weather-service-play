@@ -1,0 +1,22 @@
+version: '3.3'
+
+services:
+  weather-mysql:
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+      - 33060:33060
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "weather"
+    volumes:
+      - ./mysql:/etc/mysql/mysql.conf.d
+      - ./db:/docker-entrypoint-initdb.d
+    network_mode: host
+
+  weather-kafka:
+    image: spotify/kafka
+    ports:
+      - 2181:2181
+      - 9092:9092
+    network_mode: host

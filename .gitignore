@@ -1,9 +1,11 @@
-/logs
-/target
+logs
+target
 /.idea
 /.idea_modules
 /.classpath
 /.project
 /.settings
-/project/target
-/project/project/target
+/RUNNING_PID
+target
+project/target
+project/project/target

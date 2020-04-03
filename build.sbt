@@ -1,20 +1,30 @@
 name := """weather-service-play"""
 organization := "com.weather"
 
-version := "1.0-SNAPSHOT"
+version := "1.0.0"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val root = (project in file("."))
+  .enablePlugins(PlayScala, GraalVMNativeImagePlugin)
 
-scalaVersion := "2.12.4"
+graalVMNativeImageGraalVersion := Some("19.1.1")
+
+scalaVersion := "2.12.10"
+
+val circeVersion = "0.11.1"
 
 libraryDependencies ++= Seq(
-  guice
-  ,"org.scalatestplus.play"   %% "scalatestplus-play"   % "3.1.2" % Test
-  // Latest release for Kafka 1.0.0:
-  ,"net.cakesolutions"        %% "scala-kafka-client"   % "1.0.0"
-  ,"com.typesafe.akka"        %% "akka-stream-kafka"    % "0.19"
-  //Redis
-  ,"net.debasishg"            %% "redisclient"          % "3.5"
+  guice,
+  "com.dripower" %% "play-circe"           % "2711.0",
+  "io.circe"     %% "circe-core"           % circeVersion,
+  "io.circe"     %% "circe-generic"        % circeVersion,
+  "io.circe"     %% "circe-generic-extras" % circeVersion,
+  "io.circe"     %% "circe-parser"         % circeVersion,
+  "io.circe"     %% "circe-java8"          % circeVersion,
+  "com.typesafe.play" %% "play-slick"            % "4.0.2",
+  "com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
+  "mysql"             % "mysql-connector-java"   % "8.0.17",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
+  "org.mockito"            % "mockito-core"        % "3.0.0" % Test
 )
 
 // Adds additional packages into Twirl
@@ -22,7 +32,3 @@ libraryDependencies ++= Seq(
 
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "com.weather.binders._"
-
-resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
-
-routesGenerator := InjectedRoutesGenerator

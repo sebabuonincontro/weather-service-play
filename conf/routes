@@ -4,9 +4,8 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+POST     /board                    controllers.BoardController.create
+GET      /board                    controllers.BoardController.getAll
+DELETE   /board/:id                controllers.BoardController.remove(id: Long)
 
-# Map static resources from the /public folder to the /assets URL path
-GET     /weather                    controllers.WeatherController.getAll
-GET     /weather/:id                controllers.WeatherController.getBy(id)
-POST    /weather                    controllers.WeatherController.create
+POST     /board/:id/location       controllers.LocationController.save(id: Long)
