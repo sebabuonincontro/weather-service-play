@@ -4,9 +4,7 @@ organization := "com.weather"
 version := "1.0.0"
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala, GraalVMNativeImagePlugin)
-
-graalVMNativeImageGraalVersion := Some("19.1.1")
+  .enablePlugins(PlayScala, DockerPlugin)
 
 scalaVersion := "2.12.10"
 
@@ -25,6 +23,10 @@ libraryDependencies ++= Seq(
   "mysql"             % "mysql-connector-java"   % "8.0.17",
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
   "org.mockito"            % "mockito-core"        % "3.0.0" % Test
+)
+
+javaOptions in Universal ++= Seq(
+  "-Dpidfile.path=/dev/null"
 )
 
 // Adds additional packages into Twirl

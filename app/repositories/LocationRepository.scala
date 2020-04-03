@@ -21,7 +21,6 @@ case class LocationRepository @Inject()(val dbConfigProvider: DatabaseConfigProv
 
   def save(boardId: Long, location: Location): Future[Location] = {
     val sequence = for {
-      _ <- IO{ logger.info("")}
       board <- getById(boardId)
       locationId <- createNewLocation(location)
       _ <- createNewBoardLocation(BoardLocations(board.flatMap(_.id).getOrElse(0), locationId))

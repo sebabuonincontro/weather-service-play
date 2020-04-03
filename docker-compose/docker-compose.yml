@@ -3,6 +3,7 @@ version: '3.3'
 services:
   weather-mysql:
     image: mysql:5.7
+    container_name: weather-mysql
     ports:
       - 3306:3306
       - 33060:33060
@@ -16,6 +17,7 @@ services:
 
   weather-kafka:
     image: spotify/kafka
+    container_name: weather-kafka
     ports:
       - 2181:2181
       - 9092:9092
