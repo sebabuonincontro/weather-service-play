@@ -1,8 +1,6 @@
-package repositories.tables
+package repositories.statements
 
 import domain.BoardLocations
-import repositories.tables.Tables.boardsLocationTable
-import slick.jdbc.MySQLProfile.api._
 
 trait BoardLocationStatement {
 
