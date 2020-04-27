@@ -1,26 +1,19 @@
 package services
 
-import controllers.BoardController
-import domain.{Location, WeatherException}
+import domain.{Location, WeatherResult}
 import javax.inject.Inject
-import play.api.Logger
-import repositories.{BoardLocationRepository, BoardRepository, LocationRepository}
+import play.api.Logging
+import repositories.LocationRepository
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-class LocationService @Inject()(locationRepository: LocationRepository,
-                                boardRepository: BoardRepository,
-                                boardLocationRepository: BoardLocationRepository)
-                               (implicit val ec: ExecutionContext){
+class LocationService @Inject()(locationRepository: LocationRepository)
+                               (implicit val ec: ExecutionContext) extends Logging {
 
-  val logger = Logger(classOf[BoardController])
+  def create(boardId: Long, location: Location): WeatherResult[Location] =
+    locationRepository.save(boardId, location)
 
-  def create(boardId: Long, location: Location): Future[Either[Exception, Location]] = {
-    (for {
-      newLocation <- locationRepository.save(boardId, location)
-    } yield Right(newLocation)).recover {
-      case e: Exception => Left(new WeatherException(e.getMessage))
-    }
+  def remove(boardId: Long, locationId: Long): WeatherResult[Unit] = {
+    locationRepository.remove(boardId, locationId)
   }
-
 }

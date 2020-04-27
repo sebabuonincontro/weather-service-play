@@ -2,22 +2,36 @@ package domain
 
 import java.sql.Timestamp
 
+import io.circe.generic.semiauto._
+import io.circe.{Decoder, Encoder}
+
+
 case class Board(
   id: Option[Long],
-  description: String)
+  description: String,
+  locations: Seq[Location] = Seq())
+
+object Board {
+  implicit lazy val decoder: Decoder[Board] = deriveDecoder[Board]
+  implicit lazy val encoder: Encoder[Board] = deriveEncoder[Board]
+}
+
+case class BoardRequest(description: String)
 
 case class Location(
   id: Option[Long],
   woeid: Option[String],
   location: String)
 
-case class BoardLocations(
-  boardId: Long,
-  locationId: Long)
+object Location {
 
-case class BoardWithLocations(
-  board: Board,
-  locations: Seq[Location])
+  implicit lazy val decoder: Decoder[Location] = deriveDecoder[Location]
+  implicit lazy val encoder: Encoder[Location] = deriveEncoder[Location]
+}
+
+case class BoardLocations(
+  boardId: Option[Long],
+  locationId: Option[Long])
 
 case class News(
   id: Option[Long],

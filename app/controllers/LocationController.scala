@@ -4,7 +4,7 @@ import domain.Location
 import io.circe.generic.auto._
 import io.circe.syntax._
 import javax.inject.Inject
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.libs.circe.Circe
 import play.api.mvc.{BaseController, ControllerComponents}
 import services.LocationService
@@ -13,9 +13,7 @@ import scala.concurrent.ExecutionContext
 
 class LocationController @Inject()(val controllerComponents: ControllerComponents,
                                    val locationService: LocationService)
-                                  (implicit val ec: ExecutionContext) extends BaseController with Resolver with Circe {
-
-  val logger = Logger(classOf[LocationController])
+                                  (implicit val ec: ExecutionContext) extends BaseController with Resolver with Circe with Logging {
 
   def save(boardId: Long) = Action.async(circe.json[Location]){ request =>
     logger.info(s"Create a Location for Board: ${boardId}")
@@ -25,8 +23,10 @@ class LocationController @Inject()(val controllerComponents: ControllerComponent
     })
   }
 
-  def remove() = {
-
+  def remove(boardId: Long, locationId: Long) = Action.async { _ =>
+    locationService.remove(boardId, locationId) map( resolve(_) { _ =>
+      Ok
+    })
   }
 
   def getBy() = {

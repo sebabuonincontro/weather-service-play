@@ -1,31 +1,37 @@
 package repositories
 
-import akka.io.IO
-import domain.{BoardLocations, Location}
+import domain.{BoardLocations, Location, WeatherResult}
 import javax.inject.Inject
 import play.api.Logging
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import repositories.statements.{BoardStatement, LocationStatement}
-import repositories.tables.BoardLocationStatement
-import slick.jdbc.JdbcProfile
+import play.api.db.slick.DatabaseConfigProvider
+import repositories.statements.{BoardLocationStatement, BoardStatement, LocationStatement}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-case class LocationRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider)
-                                       (implicit val ec: ExecutionContext)
-  extends HasDatabaseConfigProvider[JdbcProfile]
-    with Logging
+case class LocationRepository @Inject()(override val dbConfigProvider: DatabaseConfigProvider)
+                                       (implicit ec: ExecutionContext)
+  extends Logging
+    with ResolveRepository
     with LocationStatement
     with BoardStatement
     with BoardLocationStatement {
 
-  def save(boardId: Long, location: Location): Future[Location] = {
+  def save(boardId: Long, location: Location): WeatherResult[Location] = {
     val sequence = for {
       board <- getById(boardId)
       locationId <- createNewLocation(location)
-      _ <- createNewBoardLocation(BoardLocations(board.flatMap(_.id).getOrElse(0), locationId))
-    } yield location.copy(id = Some(locationId))
+      _ <- createNewBoardLocation(BoardLocations(board.flatMap(_.id), locationId))
+    } yield location.copy(id = locationId)
 
-    db.run(sequence)
+    resolve(sequence)(Right(_))
+  }
+
+  def remove(boardId: Long, locationId: Long): WeatherResult[Unit] = {
+    val sequence = for {
+      _ <- removeLocation(locationId)
+      _ <- removeBoardLocation(boardId, locationId)
+    } yield()
+
+    resolve(sequence)(Right(_))
   }
 }

@@ -8,7 +8,7 @@ lazy val root = (project in file("."))
 
 scalaVersion := "2.12.10"
 
-val circeVersion = "0.11.1"
+val circeVersion = "0.13.0"
 
 libraryDependencies ++= Seq(
   guice,
@@ -17,10 +17,10 @@ libraryDependencies ++= Seq(
   "io.circe"     %% "circe-generic"        % circeVersion,
   "io.circe"     %% "circe-generic-extras" % circeVersion,
   "io.circe"     %% "circe-parser"         % circeVersion,
-  "io.circe"     %% "circe-java8"          % circeVersion,
   "com.typesafe.play" %% "play-slick"            % "4.0.2",
   "com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
   "mysql"             % "mysql-connector-java"   % "8.0.17",
+  "com.typesafe.akka" %% "akka-typed"            % "2.5.5",
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
   "org.mockito"            % "mockito-core"        % "3.0.0" % Test
 )

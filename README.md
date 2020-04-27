@@ -1,5 +1,5 @@
 # weather-service
-Consumes Yahoo weather-channel service using play 2.8, akka-type and slick 3.
+This API allows to use Yahoo weather-channel service, using frameworks like play 2.8, akka-typed and slick 3.
 
 ### build image
 $ sbt docker:publishLocal

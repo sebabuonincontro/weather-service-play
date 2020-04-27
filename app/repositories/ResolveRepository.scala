@@ -1,26 +1,25 @@
 package repositories
 
-import domain.{WeatherException, WeatherResult}
-import javax.inject.Inject
+import domain.{WeatherEither, WeatherException, WeatherResult}
 import play.api.Logging
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext
 
-class BaseRepository @Inject()(override val dbConfigProvider: DatabaseConfigProvider)
-                              (implicit ec: ExecutionContext)
-  extends HasDatabaseConfigProvider[JdbcProfile]
-    with Logging {
+trait ResolveRepository extends HasDatabaseConfigProvider[JdbcProfile] { _ : Logging =>
 
   import profile.api._
 
-  def run[T](result: DBIOAction[T, NoStream, Nothing]): WeatherResult[T] =
-    db.run(result)
-      .map(Right(_))
-      .recover {
+  def resolve[T](actions: DBIOAction[T, NoStream, Nothing])
+                (success: => T => WeatherEither[T])
+                (implicit ec: ExecutionContext): WeatherResult[T] = {
+    db.run(actions)
+      .map(success)
+      .recover{
         case e =>
           logger.error("Error while execute query", e)
-          Left(WeatherException(e.getMessage))
+          Left(new WeatherException(e.getMessage))
       }
+  }
 }
