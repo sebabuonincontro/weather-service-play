@@ -1,5 +1,5 @@
 # weather-service
-The purpose of this microservice is build a board with weather Forecast. Each user can define on or more boards, 
+The purpose of this microservice is build a board with weather Forecast. Each user can define one or more boards, 
 in order to include what locations are interesting for get information about weather forecast.
 This microservice has being created with Play Framework 2.8, akka-typed and Slick 3 stack technologies. 
 
