@@ -1,12 +1,11 @@
 package controllers
 
-import akka.stream.Materializer
-import domain.{Board, BoardRequest, WeatherException}
+import domain.{Board, BoardRequest, WeatherError}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, MustMatchers}
+import org.scalatest.{BeforeAndAfter, MustMatchers}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
@@ -27,8 +26,14 @@ class BoardControllerSpec
 
   implicit val materializer = app.materializer
   implicit val ec = mock[ExecutionContext]
-  val boardService = mock[BoardService]
-  val controller = new BoardController(stubControllerComponents(), boardService)
+
+  var boardService: BoardService = _
+  var controller: BoardController = _
+
+  before {
+    boardService = mock[BoardService]
+    controller = new BoardController(stubControllerComponents(), boardService)
+  }
 
   "BoardController" should {
     "create a board" when {
@@ -53,7 +58,7 @@ class BoardControllerSpec
         val request = BoardRequest("description")
 
         //when
-        when(boardService.save(any[BoardRequest])).thenReturn(Future(Left(new WeatherException("error"))))
+        when(boardService.save(any[BoardRequest])).thenReturn(Future(Left(new WeatherError("error"))))
         val board = controller.create()
           .apply(FakeRequest(POST, "/board")
             .withBody(request))

@@ -1,7 +1,7 @@
 package services
 
 import akka.Done
-import domain.{Board, BoardNotFound, BoardRequest, WeatherException, WeatherResult}
+import domain.{Board, BoardNotFound, BoardRequest, WeatherError, WeatherResult}
 import javax.inject.Inject
 import play.api.Logging
 import repositories.BoardRepository

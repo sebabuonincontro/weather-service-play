@@ -1,15 +1,13 @@
 package controllers
 
 import domain.{Board, BoardRequest}
+import io.circe.generic.auto._
+import io.circe.syntax._
 import javax.inject.Inject
 import play.api.Logging
 import play.api.libs.circe.Circe
 import play.api.mvc.{BaseController, ControllerComponents}
 import services.BoardService
-import io.circe._
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.syntax._
 
 import scala.concurrent.ExecutionContext
 

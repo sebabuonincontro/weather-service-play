@@ -2,32 +2,21 @@ package domain
 
 import java.sql.Timestamp
 
-import io.circe.generic.semiauto._
-import io.circe.{Decoder, Encoder}
-
+sealed trait WeatherDomain {
+  val id: Option[Long]
+}
 
 case class Board(
   id: Option[Long],
   description: String,
-  locations: Seq[Location] = Seq())
-
-object Board {
-  implicit lazy val decoder: Decoder[Board] = deriveDecoder[Board]
-  implicit lazy val encoder: Encoder[Board] = deriveEncoder[Board]
-}
+  locations: Seq[Location] = Seq()) extends WeatherDomain
 
 case class BoardRequest(description: String)
 
 case class Location(
   id: Option[Long],
   woeid: Option[String],
-  location: String)
-
-object Location {
-
-  implicit lazy val decoder: Decoder[Location] = deriveDecoder[Location]
-  implicit lazy val encoder: Encoder[Location] = deriveEncoder[Location]
-}
+  location: String) extends WeatherDomain
 
 case class BoardLocations(
   boardId: Option[Long],
@@ -39,7 +28,7 @@ case class News(
   createDate: Timestamp,
   date: String,
   temp: String,
-  condition: String)
+  condition: String) extends WeatherDomain
 
 case class Forecast(
   id: Option[Long],
@@ -48,7 +37,7 @@ case class Forecast(
   date: String,
   high: Int,
   low: Int,
-  forecast: String)
+  forecast: String) extends WeatherDomain
 
 case class RequestLimit(
                          date: Timestamp,
@@ -56,3 +45,37 @@ case class RequestLimit(
 
 //Entities used for the Rest service result
 case class LocationWithNewsAndForecasts( location: Location, news: News, forecasts: Seq[Forecast])
+
+case class YahooConfiguration(url: String, selectWoeid: String, selectForecast: String, limit: Int)
+
+case class MainBody[T](query: QueryBody[T])
+
+case class QueryBody[T](results: T)
+
+case class WoeidResponse(place: PlaceResponse)
+
+case class PlaceResponse(name: String, woeid: String)
+
+case class ResultResponse(channel: ChannelResponse)
+
+case class ChannelResponse(item: ItemResponse)
+
+case class ItemResponse(
+                         title: String,
+                         condition: ConditionResponse,
+                         forecast: Seq[ForecastResponse])
+
+case class ConditionResponse(
+                              code: String,
+                              date: String,
+                              temp: String,
+                              text: String)
+
+case class ForecastResponse(
+                             code: String,
+                             date: String,
+                             day: String,
+                             high: String,
+                             low: String,
+                             text: String)
+

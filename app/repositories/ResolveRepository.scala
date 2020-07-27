@@ -1,6 +1,6 @@
 package repositories
 
-import domain.{WeatherEither, WeatherException, WeatherResult}
+import domain.{DataBaseError, WeatherEither, WeatherError, WeatherResult}
 import play.api.Logging
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -19,7 +19,7 @@ trait ResolveRepository extends HasDatabaseConfigProvider[JdbcProfile] { _ : Log
       .recover{
         case e =>
           logger.error("Error while execute query", e)
-          Left(new WeatherException(e.getMessage))
+          Left(DataBaseError(e.getMessage))
       }
   }
 }
