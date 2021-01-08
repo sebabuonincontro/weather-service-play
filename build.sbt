@@ -5,6 +5,10 @@ version := "1.0.0"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, DockerPlugin)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings)
+
+scalaSource in IntegrationTest := baseDirectory.value / "it"
 
 scalaVersion := "2.12.10"
 
@@ -19,13 +23,17 @@ libraryDependencies ++= Seq(
   "io.circe"     %% "circe-generic"        % circeVersion,
   "io.circe"     %% "circe-generic-extras" % circeVersion,
   "io.circe"     %% "circe-parser"         % circeVersion,
+  "io.circe"     %% "circe-java8"          % "0.11.1",
   "com.typesafe.play" %% "play-slick"            % "4.0.2",
   "com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
   "mysql"             % "mysql-connector-java"   % "8.0.17",
   "com.typesafe.akka" %% "akka-actor"        % akkaVersion,
   "com.typesafe.akka" %% "akka-actor-typed"  % akkaVersion,
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test,
-  "org.mockito"            % "mockito-core"        % "3.0.0" % Test
+  "org.mockito"            % "mockito-core"        % "3.0.0" % Test,
+
+  "com.dimafeng"       %% "testcontainers-scala" % "0.29.0" % "it,test",
+  "org.testcontainers" % "mysql"                 % "1.12.0" % "it,test"
 )
 
 javaOptions in Universal ++= Seq(

@@ -1,6 +1,6 @@
 package controllers
 
-import domain.{BoardNotFound, DataBaseError, ForecastNotFound, LocationNotFound, WeatherDomain, WeatherError, YahooRequestLimitExceeded, YahooServiceError}
+import domain.{BoardNotFound, DataBaseError, ForecastNotFound, LocationNotFound, StreamError, WeatherDomain, WeatherError, YahooRequestLimitExceeded, YahooServiceError}
 import play.api.Logging
 import play.api.mvc.{BaseController, Result}
 import io.circe.syntax._
@@ -27,6 +27,9 @@ trait Resolver { _ : BaseController with Logging =>
       case Left(e: LocationNotFound) => NotFound(e.message)
       case Left(e: WeatherError) =>
         logger.error(s"Unexpected Error: ${e.message}")
+        InternalServerError(e.message)
+      case Left(e: StreamError) =>
+        logger.error(s"Stream Error: ${e.message}")
         InternalServerError(e.message)
     }
   }

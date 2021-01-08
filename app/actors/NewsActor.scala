@@ -5,26 +5,26 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import cats.data.EitherT
 import cats.implicits._
-import clients.YahooWeatherClient
+import clients.OpenWeatherClient
 import javax.inject.Inject
-import services.NewsService
+import services.ForecastService
 
 import scala.concurrent.ExecutionContext
 
 /**
  * Actor Forecast Manager. It allows to run searching of new forecast from woeid in background.
- * @param yahooWeatherClient
- * @param newsService
- * @param executionContext
+ * @param openWeatherClient injected instance of [[OpenWeatherClient]]
+ * @param forecastService injected instance of [[ForecastService]]
+ * @param executionContext instance of [[ExecutionContext]]
  */
-class NewsActor @Inject() (yahooWeatherClient: YahooWeatherClient,
-                           newsService: NewsService)(implicit val executionContext: ExecutionContext){
+class NewsActor @Inject() (openWeatherClient: OpenWeatherClient,
+                           forecastService: ForecastService)(implicit val executionContext: ExecutionContext){
 
   val behavior: Behavior[WeatherMessage] = Behaviors.receiveMessage[WeatherMessage]{
-    case GetNewsFor(woeid) =>
+    case GetNewsFor(locationId, latitude, longitude) =>
       for {
-        forecasts <- EitherT( yahooWeatherClient.getForecastFor(woeid) )
-        _ <- EitherT( newsService.saveNewsFrom(forecasts, woeid) )
+        forecasts <- EitherT( openWeatherClient.getForecastFor(latitude, longitude) )
+        _ <- EitherT( forecastService.save(forecasts.daily.toList, locationId))
       } yield ()
       Behaviors.same
   }
@@ -37,5 +37,5 @@ object NewsActor {
   val name = "news-actor"
 
   sealed trait WeatherMessage
-  case class GetNewsFor(woeid: String) extends WeatherMessage
+  case class GetNewsFor(locationId: Long, latitude: Double, longitude: Double) extends WeatherMessage
 }

@@ -12,3 +12,5 @@ DELETE   /board/:id                                 controllers.BoardController.
 POST     /board/:id/location                        controllers.LocationController.save(id: Long)
 
 DELETE   /board/:boardId/location/:locationId       controllers.LocationController.remove(boardId: Long, locationId: Long)
+
+GET      /execute                                   controllers.StreamController.execute()

@@ -2,7 +2,7 @@ package modules
 
 import actors.NewsActor
 import com.google.inject.{AbstractModule, Provides}
-import domain.YahooConfiguration
+import domain.OpenWeatherConfiguration
 import javax.inject.Singleton
 import play.api.libs.concurrent.AkkaGuiceSupport
 import play.api.{Configuration, Environment}
@@ -37,17 +37,17 @@ class Module (environment: Environment, configuration: Configuration) extends Ab
   def newsActorRef(system: akka.actor.typed.ActorSystem[actors.NewsActor.WeatherMessage]) = system.ref
 
   /**
-   * Bind a [[domain.YahooConfiguration]] instance for dependency injection.
+   * Bind a [[domain.OpenWeatherConfiguration]] instance for dependency injection.
    *
-   * @return A [[domain.YahooConfiguration]] instance.
+   * @return A [[domain.OpenWeatherConfiguration]] instance.
    */
   @Provides
-  def yahooConfiguration: YahooConfiguration =
-    YahooConfiguration(
-      url = configuration.get[String]("yahoo.url"),
-      selectWoeid =  configuration.get[String]("yahoo.select.woeid"),
-      selectForecast = configuration.get[String]("yahoo.select.forecast"),
-      limit = configuration.get[Int]("yahoo.petition.limit")
+  def yahooConfiguration: OpenWeatherConfiguration =
+    OpenWeatherConfiguration(
+      apiKey = configuration.get[String]("open-weather.api-key"),
+      urlId = configuration.get[String]("open-weather.url-id"),
+      urlForecast = configuration.get[String]("open-weather.url-forecast"),
+      limit = configuration.get[Int]("open-weather.petition.limit")
     )
 
 }

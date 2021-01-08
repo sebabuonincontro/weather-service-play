@@ -6,12 +6,13 @@ import slick.lifted.ProvenShape
 
 class LocationTable(tag: Tag) extends Table[Location](tag, "locations") {
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def woeid = column[Option[String]]("woeid")
+  def latitude = column[Double]("latitude")
+  def longitude = column[Double]("longitude")
   def location = column[String]("location")
 
-  def * : ProvenShape[Location] = (id.?, woeid, location) <> ({
-    case (id, woeid, location) => Location(id, woeid, location)
+  def * : ProvenShape[Location] = (id.?, latitude, longitude, location) <> ({
+    case (id, latitude, longitude, location) => Location(id, latitude, longitude, location)
   }, {
-    l: Location => Some((l.id, l.woeid, l.location))
+    l: Location => Some((l.id, l.latitude, l.longitude, l.location))
   })
 }

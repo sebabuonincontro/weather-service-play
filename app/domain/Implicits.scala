@@ -1,11 +1,18 @@
 package domain
 
+import java.sql.Timestamp
+
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
-
+import io.circe.java8.time.{JavaTimeDecoders, JavaTimeEncoders}
+import play.api.libs.json.Json._
 import play.api.libs.json._
 
-object Implicits {
+object Implicits extends JavaTimeEncoders
+  with JavaTimeDecoders {
+
+  implicit lazy val boardRequestDecoder: Decoder[BoardRequest] = deriveDecoder[BoardRequest]
+  implicit lazy val boardRequestEncoder: Encoder[BoardRequest] = deriveEncoder[BoardRequest]
 
   implicit lazy val boardDecoder: Decoder[Board] = deriveDecoder[Board]
   implicit lazy val boardEncoder: Encoder[Board] = deriveEncoder[Board]
@@ -13,38 +20,23 @@ object Implicits {
   implicit lazy val locationDecoder: Decoder[Location] = deriveDecoder[Location]
   implicit lazy val locationEncoder: Encoder[Location] = deriveEncoder[Location]
 
-  implicit val placeReads = Json.reads[PlaceResponse]
-  implicit val placeWrites = Json.writes[PlaceResponse]
+  implicit val tempReads = Json.reads[DailyTemperature]
+  implicit val tempWrites = Json.writes[DailyTemperature]
 
-  implicit val woeidReads = Json.reads[WoeidResponse]
-  implicit val woeidWrites = Json.writes[WoeidResponse]
+  implicit val weatherReads = Json.reads[DailyWeather]
+  implicit val weatherWrites = Json.writes[DailyWeather]
 
-  implicit val conditionReads = Json.reads[ConditionResponse]
-  implicit val conditionWrites = Json.writes[ConditionResponse]
+  implicit val dailyReads = Json.reads[DailyForecast]
+  implicit val dailyWrites = Json.writes[DailyForecast]
 
   implicit val forecastReads = Json.reads[ForecastResponse]
   implicit val forecastWrites = Json.writes[ForecastResponse]
 
-  implicit val itemReads = Json.reads[ItemResponse]
-  implicit val itemWrites = Json.writes[ItemResponse]
+  implicit val coordsReads = Json.reads[Coords]
+  implicit val coordsWrites = Json.writes[Coords]
 
-  implicit val channelReads = Json.reads[ChannelResponse]
-  implicit val channelWrites = Json.writes[ChannelResponse]
-
-  implicit val resultReads = Json.reads[ResultResponse]
-  implicit val resultWrites = Json.writes[ResultResponse]
-
-  implicit val queryBodyReads = Json.reads[QueryBody[WoeidResponse]]
-  implicit val queryBodyWrites = Json.writes[QueryBody[WoeidResponse]]
-
-  implicit val queryResultReads = Json.reads[QueryBody[ResultResponse]]
-  implicit val queryResultWrites = Json.writes[QueryBody[ResultResponse]]
-
-  implicit val mainResultReads = Json.reads[MainBody[ResultResponse]]
-  implicit val mainResultWrites = Json.writes[MainBody[ResultResponse]]
-
-  implicit val mainBodyReads = Json.reads[MainBody[WoeidResponse]]
-  implicit val mainBodyWrites = Json.writes[MainBody[WoeidResponse]]
+  implicit val locationResponseReads = Json.reads[LocationResponse]
+  implicit val locationResponseWrites = Json.writes[LocationResponse]
 
   /**
    * Errors
@@ -70,5 +62,7 @@ object Implicits {
   implicit val dbeDecoder: Decoder[DataBaseError] = deriveDecoder[DataBaseError]
   implicit val dbeEncoder: Encoder[DataBaseError] = deriveEncoder[DataBaseError]
 
+  implicit val streamDecoder: Decoder[StreamError] = deriveDecoder[StreamError]
+  implicit val streamEncoder: Encoder[StreamError] = deriveEncoder[StreamError]
 }
 

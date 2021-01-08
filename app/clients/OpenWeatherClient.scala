@@ -9,54 +9,60 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Provides connection with Yahoo Weather Service
+ * Provides connection with Open Weather API Service
  * @param ws
- * @param yahooConfiguration
+ * @param openWeatherConfiguration
  * @param ec
  */
-class YahooWeatherClient @Inject()(ws: WSClient, yahooConfiguration: OpenWeatherConfiguration)(implicit ec: ExecutionContext) extends Logging {
+class OpenWeatherClient @Inject()(
+    ws: WSClient,
+    openWeatherConfiguration: OpenWeatherConfiguration)(implicit ec: ExecutionContext) extends Logging {
 
   /**
-   * Get Woeid info through location.
+   * Get Data through location.
    * @param location location in string format
    * @return
    */
-  def getCityIdBy(location: String): WeatherResult[MainBody[WoeidResponse]] = {
-    val query = yahooConfiguration.selectWoeid + location + "'"
-    ws.url(yahooConfiguration.url)
-      .withQueryStringParameters("q" -> query, "format" -> "json")
+  def getCityDataBy(location: String): WeatherResult[LocationResponse] = {
+    ws.url(openWeatherConfiguration.urlId)
+      .withQueryStringParameters(
+        "q" -> location,
+        "appid" -> openWeatherConfiguration.apiKey)
       .get()
       .map { response: WSResponse =>
         response.status match {
-          case 200 => response.json.validate[MainBody[WoeidResponse]].fold(
+          case 200 => response.json.validate[LocationResponse].fold(
             error => {
-              logger.error(s"Yahoo Service - get Woeid. $error")
-              Left(YahooServiceError(s"Yahoo Service - get Woeid. $error"))
+              logger.error(s"OpenWeather Service - location. $error")
+              Left(YahooServiceError(s"OpenWeather - location. $error"))
             },
             body => Right(body)
           )
-          case error => Left(YahooServiceError(s"Error when call yahoo service. $error"))
+          case error => Left(YahooServiceError(s"Error when call OpenWeather Service. $error"))
         }
       }
   }
 
   /**
-   * Get forecast Info through woeid id.
-   * @param woeid
-   * @return
+   * Get forecast weekly Info through latitude and longitude data.
+   * @param latitude latitude spot.
+   * @param longitude longitude spot.
+   * @return Forecast weekly data.
    */
-  def getForecastFor(woeid: String): WeatherResult[MainBody[ResultResponse]] = {
-    val query = yahooConfiguration.selectForecast + woeid + "'"
-
-    ws.url(yahooConfiguration.url)
-      .withQueryStringParameters("q" -> query, "format" -> "json")
+  def getForecastFor(latitude: Double, longitude: Double): WeatherResult[ForecastResponse] = {
+    ws.url(openWeatherConfiguration.urlForecast)
+      .withQueryStringParameters(
+        "lat" -> latitude.toString,
+        "lon" -> longitude.toString,
+        "exclude" -> "current,minutely,hourly,alerts",
+        "appid" -> openWeatherConfiguration.apiKey)
       .get()
       .map{ response: WSResponse =>
         response.status match {
-          case 200 => response.json.validate[MainBody[ResultResponse]].fold(
+          case 200 => response.json.validate[ForecastResponse].fold(
             error => {
-              logger.error(s"Yahoo Service - get Forecast. $error")
-              Left(YahooServiceError(s"Yahoo Service - get Forecast. $error"))
+              logger.error(s"OpenWeather - get Forecast. $error")
+              Left(YahooServiceError(s"OpenWeather - get Forecast. $error"))
             },
             success => Right(success)
           )

@@ -1,6 +1,7 @@
 package domain
 
 import java.sql.Timestamp
+import java.time.LocalDateTime
 
 sealed trait WeatherDomain {
   val id: Option[Long]
@@ -15,67 +16,59 @@ case class BoardRequest(description: String)
 
 case class Location(
   id: Option[Long],
-  woeid: Option[String],
+  latitude: Double,
+  longitude: Double,
   location: String) extends WeatherDomain
 
 case class BoardLocations(
   boardId: Option[Long],
   locationId: Option[Long])
 
-case class News(
-  id: Option[Long],
-  woeid: String,
-  createDate: Timestamp,
-  date: String,
-  temp: String,
-  condition: String) extends WeatherDomain
-
 case class Forecast(
   id: Option[Long],
-  newsId: Long,
-  woeid: String,
-  date: String,
-  high: Int,
-  low: Int,
-  forecast: String) extends WeatherDomain
+  locationId: Long,
+  datetime: LocalDateTime,
+  tempMin: Double,
+  tempMax: Double,
+  humidity: Int,
+  windSpeed: Double,
+  description: String,
+  clouds: Int, //cloudiness %
+  pop: Double, //Probability of precipitation
+  rain: Option[Double], //mm
+  snow: Option[Double]  //mm
+) extends WeatherDomain
 
 case class RequestLimit(
                          date: Timestamp,
                          quantity: Int)
 
-//Entities used for the Rest service result
-case class LocationWithNewsAndForecasts( location: Location, news: News, forecasts: Seq[Forecast])
+case class OpenWeatherConfiguration(apiKey: String, urlId: String, urlForecast: String, limit: Int)
 
-case class YahooConfiguration(url: String, selectWoeid: String, selectForecast: String, limit: Int)
+case class LocationResponse(coord: Coords)
 
-case class MainBody[T](query: QueryBody[T])
+case class Coords(lat: Double, lon: Double)
 
-case class QueryBody[T](results: T)
+case class ForecastResponse(daily: Seq[DailyForecast])
 
-case class WoeidResponse(place: PlaceResponse)
+case class DailyForecast(
+  dt: LocalDateTime,
+  temp: DailyTemperature,
+  humidity: Int,
+  wind_speed: Double,
+  weather: DailyWeather,
+  clouds: Int,
+  pop: Double,
+  rain: Double,
+  snow: Double
+)
 
-case class PlaceResponse(name: String, woeid: String)
+case class DailyWeather(
+  main: String,
+  description: String
+)
 
-case class ResultResponse(channel: ChannelResponse)
-
-case class ChannelResponse(item: ItemResponse)
-
-case class ItemResponse(
-                         title: String,
-                         condition: ConditionResponse,
-                         forecast: Seq[ForecastResponse])
-
-case class ConditionResponse(
-                              code: String,
-                              date: String,
-                              temp: String,
-                              text: String)
-
-case class ForecastResponse(
-                             code: String,
-                             date: String,
-                             day: String,
-                             high: String,
-                             low: String,
-                             text: String)
+case class DailyTemperature(
+  min: Double,
+  max: Double)
 

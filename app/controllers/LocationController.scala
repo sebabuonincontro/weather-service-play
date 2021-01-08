@@ -6,7 +6,8 @@ import io.circe.syntax._
 import javax.inject.Inject
 import play.api.{Logger, Logging}
 import play.api.libs.circe.Circe
-import play.api.mvc.{BaseController, ControllerComponents}
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, BaseController, ControllerComponents}
 import services.LocationService
 
 import scala.concurrent.ExecutionContext
@@ -29,7 +30,9 @@ class LocationController @Inject()(val controllerComponents: ControllerComponent
     })
   }
 
-  def getBy() = {
-
+  def getForecastBy(locationId: Long) = Action.async { _ =>
+    locationService.getForecastBy(locationId) map( resolve(_) { forecast =>
+      Accepted(forecast.asJson)
+    })
   }
 }

@@ -35,3 +35,8 @@ case class DataBaseError(error: String) extends WeatherError {
   override val type_error: String = "db_error"
   override val message: String = s"DB Error: $error"
 }
+
+case class StreamError(error: String) extends WeatherError {
+  override val type_error: String = "stream_error"
+  override val message: String = s"Stream Error: $error"
+}

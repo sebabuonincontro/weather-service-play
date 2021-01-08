@@ -1,6 +1,6 @@
 package repositories
 
-import domain.{BoardLocations, Location, WeatherResult}
+import domain.{BoardLocations, Forecast, Location, WeatherResult}
 import javax.inject.Inject
 import play.api.Logging
 import play.api.db.slick.DatabaseConfigProvider
@@ -34,4 +34,5 @@ case class LocationRepository @Inject()(override val dbConfigProvider: DatabaseC
 
     resolve(sequence)(Right(_))
   }
+
 }

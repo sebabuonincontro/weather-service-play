@@ -1,22 +1,31 @@
 package repositories
 
-import akka.Done
 import com.google.inject.Inject
-import domain.{Forecast, ForecastResponse, WeatherResult}
+import domain.{Forecast, WeatherResult}
 import play.api.Logging
 import play.api.db.slick.DatabaseConfigProvider
-
-import scala.concurrent.ExecutionContext
-import tables.Tables._
+import repositories.statements.ForecastStatement
+import repositories.tables.Tables._
 import slick.jdbc.MySQLProfile.api._
 
+import scala.concurrent.ExecutionContext
+
+/**
+ * Persist Forecast Data.
+ * @param dbConfigProvider Database Configuration Provider Injected by Play.
+ * @param ec instance of [[ExecutionContext]]
+ */
 class ForecastRepository @Inject() () (override val dbConfigProvider: DatabaseConfigProvider)
                                    (implicit ec: ExecutionContext)
   extends Logging
+    with ForecastStatement
     with ResolveRepository{
 
   def save(forecastList: List[Forecast]) = {
     resolve(forecastTable returning forecastTable ++= forecastList)(Right(_))
   }
 
+  def getForecastFor(locationId: Long): WeatherResult[Seq[Forecast]] = {
+    resolve(getForecast(locationId))(Right(_))
+  }
 }
