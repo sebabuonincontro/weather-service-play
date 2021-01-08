@@ -14,14 +14,14 @@ import scala.concurrent.{ExecutionContext, Future}
  * @param yahooConfiguration
  * @param ec
  */
-class YahooWeatherClient @Inject()(ws: WSClient, yahooConfiguration: YahooConfiguration)(implicit ec: ExecutionContext) extends Logging {
+class YahooWeatherClient @Inject()(ws: WSClient, yahooConfiguration: OpenWeatherConfiguration)(implicit ec: ExecutionContext) extends Logging {
 
   /**
    * Get Woeid info through location.
    * @param location location in string format
    * @return
    */
-  def getWoeidBy(location: String): WeatherResult[MainBody[WoeidResponse]] = {
+  def getCityIdBy(location: String): WeatherResult[MainBody[WoeidResponse]] = {
     val query = yahooConfiguration.selectWoeid + location + "'"
     ws.url(yahooConfiguration.url)
       .withQueryStringParameters("q" -> query, "format" -> "json")

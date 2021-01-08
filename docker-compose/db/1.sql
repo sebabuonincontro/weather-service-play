@@ -8,11 +8,11 @@ CREATE TABLE `boards` (
 
 CREATE TABLE `locations` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `woeid` text,
+    `latitude` decimal(5,2) not null,
+    `longitude` decimal(5,2) not null,
     `location` text NOT NULL,
     PRIMARY KEY (`id`)
 );
-
 
 CREATE TABLE `board_locations` (
     `board_id` bigint(20) NOT NULL,
@@ -20,24 +20,19 @@ CREATE TABLE `board_locations` (
     PRIMARY KEY(`board_id`, `location_id`)
 );
 
-
 CREATE TABLE `forecasts` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `newsId` bigint(20) NOT NULL,
-    `woeid` text NOT NULL,
-    `date` text NOT NULL,
-    `high` int(11) NOT NULL,
-    `low` int(11) NOT NULL,
-    `forecast` text NOT NULL,
-    PRIMARY KEY (`id`)
+    `location_id` bigint(20) NOT NULL,
+    `date_time` timestamp NOT NULL,
+    `temp_min` decimal(4,2) NOT NULL,
+    `temp_max` decimal(4,2) NOT NULL,
+    `humidity` integer(3) NOT NULL,
+    `wind_speed` decimal(4,2) NOT NULL,
+    `description` text not null,
+    `clouds` integer(3) NOT NULL,
+    `pop` decimal(3,2) NOT NULL,
+    `rain` decimal(6,2) NULL,
+    `snow` decimal(6,2) NULL,
+    PRIMARY KEY(`id`)
 );
 
-CREATE TABLE `news` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `woeid` text NOT NULL,
-    `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `date` text NOT NULL,
-    `temp` text NOT NULL,
-    `condition` text NOT NULL,
-    PRIMARY KEY (`id`)
-);
