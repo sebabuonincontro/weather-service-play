@@ -1,43 +1,45 @@
 package domain
 
 import java.sql.Timestamp
-import java.time.LocalDateTime
 
 sealed trait WeatherDomain {
   val id: Option[Long]
 }
 
 case class Board(
-  id: Option[Long],
-  description: String,
-  locations: Seq[Location] = Seq()) extends WeatherDomain
+                  id: Option[Long],
+                  description: String,
+                  locations: Seq[Location] = Seq()) extends WeatherDomain
 
 case class BoardRequest(description: String)
 
+case class LocationRequest(
+                            id: Option[Long],
+                            location: String)
+
 case class Location(
-  id: Option[Long],
-  latitude: Double,
-  longitude: Double,
-  location: String) extends WeatherDomain
+                     id: Option[Long] = None,
+                     latitude: BigDecimal,
+                     longitude: BigDecimal,
+                     location: String) extends WeatherDomain
 
 case class BoardLocations(
-  boardId: Option[Long],
-  locationId: Option[Long])
+                           boardId: Option[Long],
+                           locationId: Option[Long])
 
 case class Forecast(
-  id: Option[Long],
-  locationId: Long,
-  datetime: LocalDateTime,
-  tempMin: Double,
-  tempMax: Double,
-  humidity: Int,
-  windSpeed: Double,
-  description: String,
-  clouds: Int, //cloudiness %
-  pop: Double, //Probability of precipitation
-  rain: Option[Double], //mm
-  snow: Option[Double]  //mm
-) extends WeatherDomain
+                     id: Option[Long],
+                     locationId: Long,
+                     tempMin: Double,
+                     tempMax: Double,
+                     humidity: Int,
+                     windSpeed: Double,
+                     description: String,
+                     clouds: Int, //cloudiness %
+                     pop: Double, //Probability of precipitation
+                     rain: Option[Double], //mm
+                     snow: Option[Double] //mm
+                   ) extends WeatherDomain
 
 case class RequestLimit(
                          date: Timestamp,
@@ -47,28 +49,26 @@ case class OpenWeatherConfiguration(apiKey: String, urlId: String, urlForecast: 
 
 case class LocationResponse(coord: Coords)
 
-case class Coords(lat: Double, lon: Double)
+case class Coords(lat: BigDecimal, lon: BigDecimal)
 
-case class ForecastResponse(daily: Seq[DailyForecast])
+case class ForecastResponse(
+                             lat: BigDecimal,
+                             lon: BigDecimal,
+                             timezone: String,
+                             timezone_offset: Long,
+                             daily: Seq[DailyForecast])
 
 case class DailyForecast(
-  dt: LocalDateTime,
-  temp: DailyTemperature,
-  humidity: Int,
-  wind_speed: Double,
-  weather: DailyWeather,
-  clouds: Int,
-  pop: Double,
-  rain: Double,
-  snow: Double
-)
-
-case class DailyWeather(
-  main: String,
-  description: String
-)
+                          temp: DailyTemperature,
+                          humidity: Int,
+                          wind_speed: Double,
+                          clouds: Int,
+                          pop: Double,
+                          rain: Option[Double],
+                          snow: Option[Double]
+                        )
 
 case class DailyTemperature(
-  min: Double,
-  max: Double)
+                             min: Double,
+                             max: Double)
 

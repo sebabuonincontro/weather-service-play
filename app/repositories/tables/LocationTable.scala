@@ -6,8 +6,8 @@ import slick.lifted.ProvenShape
 
 class LocationTable(tag: Tag) extends Table[Location](tag, "locations") {
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-  def latitude = column[Double]("latitude")
-  def longitude = column[Double]("longitude")
+  def latitude = column[BigDecimal]("latitude")
+  def longitude = column[BigDecimal]("longitude")
   def location = column[String]("location")
 
   def * : ProvenShape[Location] = (id.?, latitude, longitude, location) <> ({

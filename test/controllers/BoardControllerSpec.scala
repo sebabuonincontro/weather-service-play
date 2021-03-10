@@ -1,6 +1,6 @@
 package controllers
 
-import domain.{Board, BoardRequest, WeatherError}
+import domain.{Board, BoardNotFound, BoardRequest, WeatherError, WeatherResult}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.mockito.ArgumentMatchers._
@@ -13,6 +13,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
 import services.BoardService
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,7 +26,6 @@ class BoardControllerSpec
     with BeforeAndAfter {
 
   implicit val materializer = app.materializer
-  implicit val ec = mock[ExecutionContext]
 
   var boardService: BoardService = _
   var controller: BoardController = _
@@ -43,7 +43,7 @@ class BoardControllerSpec
         val request = BoardRequest("description")
 
         //when
-        when(boardService.save(any[BoardRequest])).thenReturn(Future(Right(expected)))
+        when(boardService.save(request)).thenReturn(WeatherResult(expected))
         val board = controller.create()
           .apply(FakeRequest(POST, "/board")
             .withBody(request))
@@ -53,18 +53,18 @@ class BoardControllerSpec
         contentType(board) mustBe Some("application/json")
         contentAsJson(board) mustBe Json.parse(expected.asJson.toString())
       }
-      "Throw Error when there is not Board" in {
+      "Throw Error when it can't find a board" in {
         //given
         val request = BoardRequest("description")
 
         //when
-        when(boardService.save(any[BoardRequest])).thenReturn(Future(Left(new WeatherError("error"))))
+        when(boardService.save(any[BoardRequest])).thenReturn(WeatherResult.error(BoardNotFound(1L)))
         val board = controller.create()
           .apply(FakeRequest(POST, "/board")
             .withBody(request))
 
         //then
-        status(board) mustBe INTERNAL_SERVER_ERROR
+        status(board) mustBe NOT_FOUND
         contentType(board) mustBe Some("application/json")
         //contentAsJson(board) mustBe Json.parse(expected.asJson.toString())
       }

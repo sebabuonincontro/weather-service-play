@@ -15,16 +15,15 @@ class ForecastService @Inject()(forecastRepository: ForecastRepository){
       Forecast(
         None,
         locationId,
-        daily.dt,
         daily.temp.min,
         daily.temp.max,
         daily.humidity,
         daily.wind_speed,
-        daily.weather.main + " - " + daily.weather.description,
+        "",
         daily.clouds,
       daily.pop,
-      Option(daily.rain),
-      Option(daily.snow))
+      daily.rain,
+      daily.snow)
     }
     forecastRepository.save(forecastList)
   }

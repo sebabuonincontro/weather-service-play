@@ -1,12 +1,8 @@
 package domain
 
-import java.sql.Timestamp
-
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.generic.semiauto._
 import io.circe.java8.time.{JavaTimeDecoders, JavaTimeEncoders}
-import play.api.libs.json.Json._
-import play.api.libs.json._
+import io.circe.{Decoder, Encoder}
 
 object Implicits extends JavaTimeEncoders
   with JavaTimeDecoders {
@@ -17,26 +13,29 @@ object Implicits extends JavaTimeEncoders
   implicit lazy val boardDecoder: Decoder[Board] = deriveDecoder[Board]
   implicit lazy val boardEncoder: Encoder[Board] = deriveEncoder[Board]
 
+  implicit lazy val locationRequestDecoder: Decoder[LocationRequest] = deriveDecoder[LocationRequest]
+  implicit lazy val locationRequestEncoder: Encoder[LocationRequest] = deriveEncoder[LocationRequest]
+
   implicit lazy val locationDecoder: Decoder[Location] = deriveDecoder[Location]
   implicit lazy val locationEncoder: Encoder[Location] = deriveEncoder[Location]
 
-  implicit val tempReads = Json.reads[DailyTemperature]
-  implicit val tempWrites = Json.writes[DailyTemperature]
+  implicit val tempReads: Decoder[DailyTemperature] = deriveDecoder[DailyTemperature]
+  implicit val tempWrites: Encoder[DailyTemperature] = deriveEncoder[DailyTemperature]
 
-  implicit val weatherReads = Json.reads[DailyWeather]
-  implicit val weatherWrites = Json.writes[DailyWeather]
+//  implicit val weatherReads: Decoder[DailyWeather] = deriveDecoder[DailyWeather]
+//  implicit val weatherWrites: Encoder[DailyWeather] = deriveEncoder[DailyWeather]
 
-  implicit val dailyReads = Json.reads[DailyForecast]
-  implicit val dailyWrites = Json.writes[DailyForecast]
+  implicit val dailyReads: Decoder[DailyForecast] = deriveDecoder[DailyForecast]
+  implicit val dailyWrites: Encoder[DailyForecast] = deriveEncoder[DailyForecast]
 
-  implicit val forecastReads = Json.reads[ForecastResponse]
-  implicit val forecastWrites = Json.writes[ForecastResponse]
+  implicit val coordsEncoder: Decoder[Coords] = deriveDecoder[Coords]
+  implicit val coordsDecoder: Encoder[Coords] = deriveEncoder[Coords]
 
-  implicit val coordsReads = Json.reads[Coords]
-  implicit val coordsWrites = Json.writes[Coords]
+  implicit val forecastDecoder: Decoder[ForecastResponse] = deriveDecoder[ForecastResponse]
+  implicit val forecastEncoder: Encoder[ForecastResponse] = deriveEncoder[ForecastResponse]
 
-  implicit val locationResponseReads = Json.reads[LocationResponse]
-  implicit val locationResponseWrites = Json.writes[LocationResponse]
+  implicit val locationResponseReads = deriveDecoder[LocationResponse]
+  implicit val locationResponseWrites = deriveEncoder[LocationResponse]
 
   /**
    * Errors

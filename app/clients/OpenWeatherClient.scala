@@ -7,7 +7,7 @@ import play.api.Logging
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-
+import io.circe.parser.decode
 /**
  * Provides connection with Open Weather API Service
  * @param ws
@@ -31,7 +31,8 @@ class OpenWeatherClient @Inject()(
       .get()
       .map { response: WSResponse =>
         response.status match {
-          case 200 => response.json.validate[LocationResponse].fold(
+          case 200 =>
+            decode[LocationResponse](response.body).fold(
             error => {
               logger.error(s"OpenWeather Service - location. $error")
               Left(YahooServiceError(s"OpenWeather - location. $error"))
@@ -49,7 +50,7 @@ class OpenWeatherClient @Inject()(
    * @param longitude longitude spot.
    * @return Forecast weekly data.
    */
-  def getForecastFor(latitude: Double, longitude: Double): WeatherResult[ForecastResponse] = {
+  def getForecastFor(latitude: BigDecimal, longitude: BigDecimal): WeatherResult[ForecastResponse] = {
     ws.url(openWeatherConfiguration.urlForecast)
       .withQueryStringParameters(
         "lat" -> latitude.toString,
@@ -59,13 +60,16 @@ class OpenWeatherClient @Inject()(
       .get()
       .map{ response: WSResponse =>
         response.status match {
-          case 200 => response.json.validate[ForecastResponse].fold(
+          case 200 =>
+            decode[ForecastResponse](response.body).fold(
             error => {
               logger.error(s"OpenWeather - get Forecast. $error")
               Left(YahooServiceError(s"OpenWeather - get Forecast. $error"))
             },
-            success => Right(success)
+            success =>
+              Right(success)
           )
+          case error => Left(YahooServiceError(s"Error when call OpenWeather Service. $error"))
         }
       }
 

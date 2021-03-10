@@ -23,7 +23,6 @@ class ForecastTable(tag: Tag) extends Table[Forecast](tag, "forecasts") {
   override def * = (
     id.?,
     locationId,
-    datetime,
     tempMin,
     tempMax,
     humidity,

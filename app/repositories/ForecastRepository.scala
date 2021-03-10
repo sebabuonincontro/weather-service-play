@@ -22,7 +22,9 @@ class ForecastRepository @Inject() () (override val dbConfigProvider: DatabaseCo
     with ResolveRepository{
 
   def save(forecastList: List[Forecast]) = {
-    resolve(forecastTable returning forecastTable ++= forecastList)(Right(_))
+    forecastList.tail.foldLeft( resolve(forecastTable.insertOrUpdate(forecastList.head))(Right(_)) ){ (_, next) =>
+      resolve(forecastTable.insertOrUpdate(next))(Right(_))
+    }
   }
 
   def getForecastFor(locationId: Long): WeatherResult[Seq[Forecast]] = {

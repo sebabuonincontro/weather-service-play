@@ -37,5 +37,5 @@ object NewsActor {
   val name = "news-actor"
 
   sealed trait WeatherMessage
-  case class GetNewsFor(locationId: Long, latitude: Double, longitude: Double) extends WeatherMessage
+  case class GetNewsFor(locationId: Long, latitude: BigDecimal, longitude: BigDecimal) extends WeatherMessage
 }

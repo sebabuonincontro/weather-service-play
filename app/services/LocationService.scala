@@ -7,20 +7,19 @@ import akka.actor.typed.ActorRef._
 import cats.data._
 import cats.implicits._
 import clients.OpenWeatherClient
-import domain.{Forecast, Location, WeatherResult}
-import javax.inject.Inject
+import domain.{Forecast, Location, LocationRequest, WeatherResult}
 import play.api.Logging
-import play.api.mvc.Result
 import repositories.{ForecastRepository, LocationRepository}
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 /**
  * Provides functionality to create, update a remove any location.
  *
  * @param locationRepository as instance of [[LocationRepository]]
- * @param openWeatherClient as intance of [[OpenWeatherClient]]
- * @param ec [[ExecutionContext]]
+ * @param openWeatherClient  as intance of [[OpenWeatherClient]]
+ * @param ec                 [[ExecutionContext]]
  */
 class LocationService @Inject()(locationRepository: LocationRepository,
                                 forecastRepository: ForecastRepository,
@@ -31,16 +30,16 @@ class LocationService @Inject()(locationRepository: LocationRepository,
   /**
    * Create a new Location from a BoardId. Also, calls openWeatherService to obtain location data.
    *
-   * @param boardId board id
+   * @param boardId  board id
    * @param location new location
    * @return an instance of new location
    */
-  def create(boardId: Long, location: Location): WeatherResult[Location] = {
+  def create(boardId: Long, location: LocationRequest): WeatherResult[Location] = {
     logger.info(s"Creating new location $location")
     val result = for {
-      updated <- EitherT( searchLocation(location) )
-      newLocation <- EitherT( locationRepository.save(boardId, updated))
-      _ <- EitherT( searchForNews(location.id, newLocation.latitude, newLocation.longitude))
+      updated <- EitherT(searchLocation(location))
+      newLocation <- EitherT(locationRepository.save(boardId, updated))
+      _ <- EitherT(searchForNews(newLocation.id, newLocation.latitude, newLocation.longitude))
     } yield newLocation
 
     result.value
@@ -48,11 +47,12 @@ class LocationService @Inject()(locationRepository: LocationRepository,
 
   /**
    * sends message of weather actor so that it looks new forecast about location.
-   * @param latitude latitude of location
+   *
+   * @param latitude  latitude of location
    * @param longitude longitude of location
    * @return Done when it finishes
    */
-  private def searchForNews(locationId: Option[Long], latitude: Double, longitude: Double): WeatherResult[Done] = {
+  private def searchForNews(locationId: Option[Long], latitude: BigDecimal, longitude: BigDecimal): WeatherResult[Done] = {
     locationId match {
       case Some(id) =>
         actor ! GetNewsFor(id, latitude, longitude)
@@ -65,17 +65,19 @@ class LocationService @Inject()(locationRepository: LocationRepository,
 
   /**
    * calls OpenWeatherClient so as to get latitude and longitude data from current location.
+   *
    * @param location the current location.
    * @return a copy of location object with latitude and longitude data.
    */
-  private def searchLocation(location: Location): WeatherResult[Location] = {
+  private def searchLocation(location: LocationRequest): WeatherResult[Location] = {
     logger.info(s"get data from yahoo for ${location.location}")
     (for {
-      response <- EitherT( openWeatherClient.getCityDataBy(location.location) )
-        place = response
-      updated <- EitherT(WeatherResult(location.copy(
-        latitude = place.coord.lat,
-        longitude = place.coord.lon)))
+      response <- EitherT(openWeatherClient.getCityDataBy(location.location))
+      updated <- EitherT(WeatherResult(Location(
+        location = location.location,
+        latitude = response.coord.lat,
+        longitude = response.coord.lon
+      )))
     } yield updated).value
   }
 

@@ -1,17 +1,18 @@
 package controllers
 
-import domain.{BoardNotFound, DataBaseError, ForecastNotFound, LocationNotFound, StreamError, WeatherDomain, WeatherError, YahooRequestLimitExceeded, YahooServiceError}
-import play.api.Logging
-import play.api.mvc.{BaseController, Result}
+import domain.Implicits._
+import domain.{BoardNotFound, LocationNotFound, StreamError, WeatherError}
 import io.circe.syntax._
+import play.api.Logging
+import play.api.libs.circe.Circe
+import play.api.mvc.{BaseController, Result}
 
 import scala.concurrent.ExecutionContext
-import domain.Implicits._
 
 /**
  * Trait contains a resolver and an handler error for Controller purpose.
  */
-trait Resolver { _ : BaseController with Logging =>
+trait Resolver { _ : BaseController with Circe with Logging =>
 
   /**
    *
@@ -23,14 +24,14 @@ trait Resolver { _ : BaseController with Logging =>
   def resolve[T]( result: Either[WeatherError, T])(fnc: T => Result)(implicit ec: ExecutionContext): Result = {
     result match {
       case Right(v: T) => fnc(v)
-      case Left(e: BoardNotFound) => NotFound(e.message)
-      case Left(e: LocationNotFound) => NotFound(e.message)
+      case Left(e: BoardNotFound) => NotFound(e.asJson)
+      case Left(e: LocationNotFound) => NotFound(e.asJson)
       case Left(e: WeatherError) =>
         logger.error(s"Unexpected Error: ${e.message}")
-        InternalServerError(e.message)
+        InternalServerError(e.asJson)
       case Left(e: StreamError) =>
-        logger.error(s"Stream Error: ${e.message}")
-        InternalServerError(e.message)
+        logger.error(s"Stream Error: ${e}")
+        InternalServerError(e.asJson)
     }
   }
 
